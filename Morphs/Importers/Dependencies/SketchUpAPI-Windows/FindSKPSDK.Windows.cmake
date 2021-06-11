@@ -3,8 +3,8 @@ cmake_minimum_required(VERSION 3.9)
 # Try to find the SketchUp SDK and load it.  It can be referenced in the code by using the 'SKPSDK' target name.
 if(NOT SKPSDK_CHECK_RUN)
 	set(SKPSDK_CHECK_RUN TRUE)
-
-	if(EXISTS "${CMAKE_CURRENT_LIST_DIR}/FindSKPSDK.Win32.cmake")
+	
+	if(EXISTS "${CMAKE_CURRENT_LIST_DIR}/SKPSDK.Windows.cmake")
 		set(SKPSDK_FOUND TRUE)
 		find_package(SKPSDK.Win32 COMPONENTS ${CMAKE_GENERATOR_PLATFORM})
 		message(STATUS "Found SKPSDK.Win32")

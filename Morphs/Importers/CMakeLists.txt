@@ -5,6 +5,7 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_GENERATOR_PLATFORM "x64")
 
 # External Dependencies
 add_subdirectory(Dependencies/RapidJSON)
@@ -18,6 +19,8 @@ if(WIN32)
 	
 	if(SKPSDK_FOUND)
 		add_definitions(-DHAS_SKP_LIB)
+	else ()
+		message(STATUS "---------------${CMAKE_SOURCE_DIR}/Dependencies/SketchUpAPI-Windows")
 	endif()
 endif()
 
