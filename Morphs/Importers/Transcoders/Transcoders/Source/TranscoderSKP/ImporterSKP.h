@@ -42,7 +42,7 @@ namespace Babylon
             void ExportFaces(Mesh& mesh, const std::vector<SUFaceRef>& faces, SUDrawingElementRef ancestorElement);
             void ExportEdges(Mesh& mesh, const std::vector<SUEdgeRef>& edges);
 
-            void AddFacesGeometry(Mesh& mesh, std::shared_ptr<MaterialDescriptor> material, const std::vector<SUFaceRef>& faces, SkpUtils::Side side);
+            void AddFacesGeometry(Mesh& mesh, std::shared_ptr<MaterialDescriptor> material, const std::vector<SUFaceRef>& faces, SkpUtils::Side side, SUMaterialRef mat);
 
             std::shared_ptr<MaterialDescriptor> GetMaterial(SUMaterialRef suMaterial, SkpUtils::Side side, SUFaceRef suFace, SUDrawingElementRef ancestorElement);
             std::shared_ptr<TextureDescriptor> GetTexture(long textureHandle);

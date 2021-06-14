@@ -57,6 +57,15 @@ namespace
         );
     }
 
+    Babylon::Utils::Math::Vector2 ToVector2UV(const SUPoint2D& point)
+    {
+        // point.x = S, point.y = T, point.z = Q
+        return Babylon::Utils::Math::Vector2(
+            static_cast<float>(point.x),
+            static_cast<float>(point.y)
+        );
+    }
+
     // Note: SKP and Asset3D use different coordinate systems and we need to convert between the two.
     // This function provides the rotation matrix to do that.
     // SketchUp uses a right-handed system with positive X facing out of the screen and positive Y to the right
@@ -106,7 +115,8 @@ std::shared_ptr<Asset3D> ImporterSKP::ImportToAsset3D(std::shared_ptr<std::istre
     m_progressReporter = progress;
 
     // Load the model from the buffer
-    SkpUtils::CheckResult(SUModelCreateFromBuffer(&m_suModel, data.get(), length));
+    SUModelLoadStatus status;
+    SkpUtils::CheckResult(SUModelCreateFromBufferWithStatus(&m_suModel, data.get(), length, &status));
     SkpUtils::CheckResult(SUTextureWriterCreate(&m_suTextureWriter));
     SkpUtils::CheckResult(SUModelGetRenderingOptions(m_suModel, &m_suRenderingOptions));
 
@@ -413,7 +423,7 @@ void ImporterSKP::ExportFaces(Mesh& mesh, const std::vector<SUFaceRef>& faces, S
         for (const auto& pair : materialToFaces)
         {
             const auto& material = GetMaterial(pair.first, side, pair.second[0], ancestorElement);
-            AddFacesGeometry(mesh, std::move(material), pair.second, side);
+            AddFacesGeometry(mesh, /*std::move(*/material/*)*/, pair.second, side, pair.first);
             m_cancellationToken->CheckCancelledAndThrow();
         }
     };
@@ -471,9 +481,10 @@ void ImporterSKP::ExportEdges(Mesh& mesh, const std::vector<SUEdgeRef>& edges)
     }
 }
 
-void ImporterSKP::AddFacesGeometry(Mesh& mesh, std::shared_ptr<MaterialDescriptor> material, const std::vector<SUFaceRef>& faces, SkpUtils::Side side)
+void ImporterSKP::AddFacesGeometry(Mesh& mesh, std::shared_ptr<MaterialDescriptor> material, const std::vector<SUFaceRef>& faces, SkpUtils::Side side, SUMaterialRef mat)
 {
     bool hasTexture = static_cast<bool>(material->GetLayer(LayerType::kBaseColor)->Texture);
+    //hasTexture = true;
     Geometry geometry{ std::move(material) };
 
     for (const auto& face : faces)
@@ -510,17 +521,19 @@ void ImporterSKP::AddFacesGeometry(Mesh& mesh, std::shared_ptr<MaterialDescripto
         std::vector<SUVector3D> normals(vertexCount);
         SkpUtils::CheckResult(SUMeshHelperGetNormals(meshHelper, vertexCount, normals.data(), &count));
 
-        std::vector<SUPoint3D> coords;
+        std::vector<SUPoint2D> uvs;
         if (hasTexture)
         {
-            coords.resize(vertexCount);
+            SUFaceSetFrontMaterial(face, mat);
+
+            uvs.resize(vertexCount);
             if (side == SkpUtils::Side::Front || side == SkpUtils::Side::Both)
             {
-                SkpUtils::CheckResult(SUMeshHelperGetFrontSTQCoords(meshHelper, vertexCount, coords.data(), &count));
+                SUTextureWriterGetFrontFaceUVCoords(m_suTextureWriter, face, vertexCount, positions.data(), uvs.data());
             }
             else
             {
-                SkpUtils::CheckResult(SUMeshHelperGetBackSTQCoords(meshHelper, vertexCount, coords.data(), &count));
+                SUTextureWriterGetBackFaceUVCoords(m_suTextureWriter, face, vertexCount, positions.data(), uvs.data());
             }
         }
 
@@ -552,9 +565,9 @@ void ImporterSKP::AddFacesGeometry(Mesh& mesh, std::shared_ptr<MaterialDescripto
 
                 if (hasTexture)
                 {
-                    geometry.AddUv0(ToVector2UV(coords[index0]));
-                    geometry.AddUv0(ToVector2UV(coords[index1]));
-                    geometry.AddUv0(ToVector2UV(coords[index2]));
+                    geometry.AddUv0(ToVector2UV(uvs[index0]));
+                    geometry.AddUv0(ToVector2UV(uvs[index1]));
+                    geometry.AddUv0(ToVector2UV(uvs[index2]));
                 }
             }
             else
@@ -569,9 +582,10 @@ void ImporterSKP::AddFacesGeometry(Mesh& mesh, std::shared_ptr<MaterialDescripto
 
                 if (hasTexture)
                 {
-                    geometry.AddUv0(ToVector2UV(coords[index0]));
-                    geometry.AddUv0(ToVector2UV(coords[index2]));
-                    geometry.AddUv0(ToVector2UV(coords[index1]));
+                    geometry.AddUv0(ToVector2UV(uvs[index0]));
+                    geometry.AddUv0(ToVector2UV(uvs[index1]));
+                    geometry.AddUv0(ToVector2UV(uvs[index2]));
+
                 }
             }
         }
