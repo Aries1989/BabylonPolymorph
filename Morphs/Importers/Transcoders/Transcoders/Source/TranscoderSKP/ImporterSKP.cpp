@@ -72,10 +72,16 @@ namespace
     // Viewer uses a left-handed sytem with positive X facing out of the screen and positive Y up
     Babylon::Utils::Math::Matrix GetCoordinateSystemTransformationMatrix()
     {
+        //return Babylon::Utils::Math::Matrix(
+        //    -1.0f, 0.0f, 0.0f, 0.0f,
+        //    0.0f, 0.0f, 1.0f, 0.0f,
+        //    0.0f, 1.0f, 0.0f, 0.0f,
+        //    0.0f, 0.0f, 0.0f, 0.0f
+        //);
         return Babylon::Utils::Math::Matrix(
-           -1.0f, 0.0f, 0.0f, 0.0f,
-            0.0f, 0.0f, 1.0f, 0.0f,
+            1.0f, 0.0f, 0.0f, 0.0f,
             0.0f, 1.0f, 0.0f, 0.0f,
+            0.0f, 0.0f, 1.0f, 0.0f,
             0.0f, 0.0f, 0.0f, 0.0f
         );
     }
@@ -477,6 +483,9 @@ void ImporterSKP::ExportEdges(Mesh& mesh, const std::vector<SUEdgeRef>& edges)
         edgeGeometry.SetTopology(GeometryTopology::kLines);
         edgeGeometry.SetPositions(positions);
 
+        edgeGeometry.AddIndex(0);
+        edgeGeometry.AddIndex(1);
+
         mesh.AddGeometry(std::move(edgeGeometry));
     }
 }
@@ -484,7 +493,6 @@ void ImporterSKP::ExportEdges(Mesh& mesh, const std::vector<SUEdgeRef>& edges)
 void ImporterSKP::AddFacesGeometry(Mesh& mesh, std::shared_ptr<MaterialDescriptor> material, const std::vector<SUFaceRef>& faces, SkpUtils::Side side, SUMaterialRef mat)
 {
     bool hasTexture = static_cast<bool>(material->GetLayer(LayerType::kBaseColor)->Texture);
-    //hasTexture = true;
     Geometry geometry{ std::move(material) };
 
     for (const auto& face : faces)
@@ -583,8 +591,8 @@ void ImporterSKP::AddFacesGeometry(Mesh& mesh, std::shared_ptr<MaterialDescripto
                 if (hasTexture)
                 {
                     geometry.AddUv0(ToVector2UV(uvs[index0]));
-                    geometry.AddUv0(ToVector2UV(uvs[index1]));
                     geometry.AddUv0(ToVector2UV(uvs[index2]));
+                    geometry.AddUv0(ToVector2UV(uvs[index1]));
 
                 }
             }
@@ -593,6 +601,14 @@ void ImporterSKP::AddFacesGeometry(Mesh& mesh, std::shared_ptr<MaterialDescripto
 
     if (geometry.HasPositions())
     {
+        if (!geometry.HasIndices())
+        {
+            for (int i=0; i<geometry.GetVertexCount(); ++i)
+            {
+                geometry.AddIndex(i);
+            }
+        }
+
         mesh.AddGeometry(std::move(geometry));
     }
 }
