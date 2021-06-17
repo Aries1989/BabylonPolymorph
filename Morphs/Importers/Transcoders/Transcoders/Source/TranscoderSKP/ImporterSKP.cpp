@@ -6,6 +6,7 @@
 
 #include "TranscodersPch.h"
 #include "ImporterSKP.h"
+#include <iostream>
 
 #include <CoreUtils/Platform.h>
 #if CANVAS_CAN_USE_SKP()
@@ -130,7 +131,8 @@ std::shared_ptr<Asset3D> ImporterSKP::ImportToAsset3D(std::shared_ptr<std::istre
     auto asset3d = std::make_shared<Asset3D>();
 
     // Set the Asset3D system unit
-    asset3d->SetSystemUnit(SkpUtils::GetUnitInCentimeter(m_suModel));
+    auto unit = SkpUtils::GetUnitInCentimeter(m_suModel);
+    asset3d->SetSystemUnit(unit);
 
     // Set required model transform (coordinate switch + translation to origin + camera roll compensation)
     asset3d->SetTransform(GetCoordinateSystemTransformationMatrix());
@@ -556,6 +558,12 @@ void ImporterSKP::AddFacesGeometry(Mesh& mesh, std::shared_ptr<MaterialDescripto
             auto position0 = SkpUtils::ToVector3(positions[index0]);
             auto position1 = SkpUtils::ToVector3(positions[index1]);
             auto position2 = SkpUtils::ToVector3(positions[index2]);
+#if _DEBUG
+            std::cout << positions[index0].x << "   " << positions[index0].y << "   " << positions[index0].z <<  std::endl;
+            std::cout << positions[index1].x << "   " << positions[index1].y << "   " << positions[index1].z << std::endl;
+            std::cout << positions[index2].x << "   " << positions[index2].y << "   " << positions[index2].z << std::endl;
+            std::cout << "--------------------------------------------------------" << std::endl;
+#endif
 
             auto normal0 = SkpUtils::ToVector3(normals[index0]);
             auto normal1 = SkpUtils::ToVector3(normals[index1]);

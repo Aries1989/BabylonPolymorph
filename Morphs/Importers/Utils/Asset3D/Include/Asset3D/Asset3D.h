@@ -6,6 +6,7 @@
 #pragma once
 
 #include <vector>
+#include <iostream>
 
 #include <Asset3D/Animation.h>
 #include <Asset3D/SceneNode.h>
@@ -116,7 +117,10 @@ namespace Babylon
 
             // SystemUnit/Scale
             UnitInCentimeter GetSystemUnit() const { return m_systemUnit; };
-            void SetSystemUnit(UnitInCentimeter unit) { m_systemUnit = unit; }
+            void SetSystemUnit(UnitInCentimeter unit) {
+                std::cout << "----------------- system unit: " << unit << std::endl;
+                m_systemUnit = unit; 
+            }
             Utils::Math::Matrix GetUnitScaledTransform(UnitInCentimeter unit) const;
 
             static float CalculateConversionScale(UnitInCentimeter origUnit, UnitInCentimeter DestUnit);
