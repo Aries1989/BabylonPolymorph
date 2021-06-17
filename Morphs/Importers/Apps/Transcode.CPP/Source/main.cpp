@@ -292,7 +292,7 @@ int main(int argc, char* argv[])
     SetVerbosity(verbosity);
 
     // Get export format, default is "glb"
-    auto format = argParser.GetArgument("--format", "glb");
+    auto format = argParser.GetArgument("--format", "gltf");
 
     // Get destination directory and sanitize it
     auto destination = argParser.GetArgument("--destination");

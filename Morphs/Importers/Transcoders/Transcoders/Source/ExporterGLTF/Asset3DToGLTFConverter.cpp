@@ -320,8 +320,8 @@ namespace
 
     void SetGltfTRS(glTF::Node& node, const Babylon::Utils::Math::Matrix& sourceMatrix, bool bRoot = false)
     {
-        if (bRoot)
-        {
+        //if (bRoot)
+        //{
             Babylon::Utils::Math::Vector3 translation;
             Babylon::Utils::Math::Quaternion rotation;
             Babylon::Utils::Math::Vector3 scale;
@@ -343,16 +343,16 @@ namespace
             //node.scale.x = (scale.x == 0.0f ? scale.x : (1.0f / scale.x));
             //node.scale.y = (scale.y == 0.0f ? scale.y : (1.0f / scale.y));
             //node.scale.z = (scale.z == 0.0f ? scale.z : (1.0f / scale.z));
-        }
-        else
-        {
-            node.matrix.values = {
-                sourceMatrix(0, 0), sourceMatrix(0, 1), sourceMatrix(0, 2), sourceMatrix(0, 3),
-                sourceMatrix(1, 0), sourceMatrix(1, 1), sourceMatrix(1, 2), sourceMatrix(1, 3),
-                sourceMatrix(2, 0), sourceMatrix(2, 1), sourceMatrix(2, 2), sourceMatrix(2, 3),
-                sourceMatrix(3, 0), sourceMatrix(3, 1), sourceMatrix(3, 2), sourceMatrix(3, 3)
-            };
-        }
+        //}
+        //else
+        //{
+        //    node.matrix.values = {
+        //        sourceMatrix(0, 0), sourceMatrix(0, 1), sourceMatrix(0, 2), sourceMatrix(0, 3),
+        //        sourceMatrix(1, 0), sourceMatrix(1, 1), sourceMatrix(1, 2), sourceMatrix(1, 3),
+        //        sourceMatrix(2, 0), sourceMatrix(2, 1), sourceMatrix(2, 2), sourceMatrix(2, 3),
+        //        sourceMatrix(3, 0), sourceMatrix(3, 1), sourceMatrix(3, 2), sourceMatrix(3, 3)
+        //    };
+        //}
     }
 
     std::string GetGenerator()
@@ -841,14 +841,39 @@ void Asset3DToGLTFConverter::PopulateDocument(IGLTFWriter& writer)
         gltfNode.name = sceneNode->GetName();
         gltfNode.weights = sceneNode->GetMorphWeights();
 
+        Babylon::Utils::Math::Vector3 outScale;
+        Babylon::Utils::Math::Quaternion outRotation;
+        Babylon::Utils::Math::Vector3 outTranslation;
+
         if (parentNode == nullptr) // SceneNode = glTF::Node (root)
         {
-            SetGltfTRS(gltfNode, m_asset3d.GetUnitScaledTransform(Asset3D::SYSTEMUNIT_METER), true);
+            auto mtx = m_asset3d.GetUnitScaledTransform(Asset3D::SYSTEMUNIT_METER);
+            //if (!MatrixDecompose(mtx, outScale, outRotation, outTranslation))
+            //{
+            //    std::cout << "--------------------------------------------------------" << "0" << std::endl;
+            //    std::cout << mtx(0, 0) << "\t\t" << mtx(0, 1) << "\t\t" << mtx(0, 2) << "\t\t" << mtx(0, 3) << std::endl;
+            //    std::cout << mtx(1, 0) << "\t\t" << mtx(1, 1) << "\t\t" << mtx(1, 2) << "\t\t" << mtx(1, 3) << std::endl;
+            //    std::cout << mtx(2, 0) << "\t\t" << mtx(2, 1) << "\t\t" << mtx(2, 2) << "\t\t" << mtx(2, 3) << std::endl;
+            //    std::cout << mtx(3, 0) << "\t\t" << mtx(3, 1) << "\t\t" << mtx(3, 2) << "\t\t" << mtx(3, 3) << std::endl;
+            //    std::cout << "---------------------------------------------------------" << std::endl;
+            //}
+            
+            SetGltfTRS(gltfNode, mtx, true);
             gltfScene.nodes.push_back(gltfNode.id);
         }
         else // SceneNode = glTF::Node (non-root)
         {
-            SetGltfTRS(gltfNode, sceneNode->GetTransform());
+            const auto& mtx = sceneNode->GetTransform();
+            //if (!MatrixDecompose(mtx, outScale, outRotation, outTranslation))
+            //{
+            //    std::cout << "--------------------------------------------------------" << parentNode->GetId() << std::endl;
+            //    std::cout << mtx(0, 0) << "\t\t" << mtx(0, 1) << "\t\t" << mtx(0, 2) << "\t\t" << mtx(0, 3) << std::endl;
+            //    std::cout << mtx(1, 0) << "\t\t" << mtx(1, 1) << "\t\t" << mtx(1, 2) << "\t\t" << mtx(1, 3) << std::endl;
+            //    std::cout << mtx(2, 0) << "\t\t" << mtx(2, 1) << "\t\t" << mtx(2, 2) << "\t\t" << mtx(2, 3) << std::endl;
+            //    std::cout << mtx(3, 0) << "\t\t" << mtx(3, 1) << "\t\t" << mtx(3, 2) << "\t\t" << mtx(3, 3) << std::endl;
+            //    std::cout << "---------------------------------------------------------" << std::endl;
+            //}
+            SetGltfTRS(gltfNode, mtx);
             nodes[parentNode->GetIdString()].children.push_back(gltfNode.id);
         }
 
@@ -856,8 +881,8 @@ void Asset3DToGLTFConverter::PopulateDocument(IGLTFWriter& writer)
 
         if (sceneNode->GetCamera())
         {
-            auto a3dCamera = sceneNode->GetCamera().get();
-            auto camera = ToGLTFCamera(*a3dCamera);
+            auto a3dCamera = sceneNode->GetCamera();
+            auto camera = ToGLTFCamera(*(a3dCamera.get()));
             CopyToGltfProperty(*a3dCamera, *m_gltfDocument, camera);
             m_gltfDocument->cameras.Append(std::move(camera));
             gltfNode.cameraId = camera.id;

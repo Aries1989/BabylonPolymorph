@@ -558,12 +558,14 @@ void ImporterSKP::AddFacesGeometry(Mesh& mesh, std::shared_ptr<MaterialDescripto
             auto position0 = SkpUtils::ToVector3(positions[index0]);
             auto position1 = SkpUtils::ToVector3(positions[index1]);
             auto position2 = SkpUtils::ToVector3(positions[index2]);
-#if _DEBUG
-            std::cout << positions[index0].x << "   " << positions[index0].y << "   " << positions[index0].z <<  std::endl;
-            std::cout << positions[index1].x << "   " << positions[index1].y << "   " << positions[index1].z << std::endl;
-            std::cout << positions[index2].x << "   " << positions[index2].y << "   " << positions[index2].z << std::endl;
-            std::cout << "--------------------------------------------------------" << std::endl;
-#endif
+
+            //if (i < 3)
+            //{
+            //    std::cout << positions[index0].x << "   " << positions[index0].y << "   " << positions[index0].z << std::endl;
+            //    std::cout << positions[index1].x << "   " << positions[index1].y << "   " << positions[index1].z << std::endl;
+            //    std::cout << positions[index2].x << "   " << positions[index2].y << "   " << positions[index2].z << std::endl;
+            //    std::cout << "--------------------------------------------------------" << std::endl;
+            //}
 
             auto normal0 = SkpUtils::ToVector3(normals[index0]);
             auto normal1 = SkpUtils::ToVector3(normals[index1]);
