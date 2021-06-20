@@ -848,31 +848,12 @@ void Asset3DToGLTFConverter::PopulateDocument(IGLTFWriter& writer)
         if (parentNode == nullptr) // SceneNode = glTF::Node (root)
         {
             auto mtx = m_asset3d.GetUnitScaledTransform(Asset3D::SYSTEMUNIT_METER);
-            //if (!MatrixDecompose(mtx, outScale, outRotation, outTranslation))
-            //{
-            //    std::cout << "--------------------------------------------------------" << "0" << std::endl;
-            //    std::cout << mtx(0, 0) << "\t\t" << mtx(0, 1) << "\t\t" << mtx(0, 2) << "\t\t" << mtx(0, 3) << std::endl;
-            //    std::cout << mtx(1, 0) << "\t\t" << mtx(1, 1) << "\t\t" << mtx(1, 2) << "\t\t" << mtx(1, 3) << std::endl;
-            //    std::cout << mtx(2, 0) << "\t\t" << mtx(2, 1) << "\t\t" << mtx(2, 2) << "\t\t" << mtx(2, 3) << std::endl;
-            //    std::cout << mtx(3, 0) << "\t\t" << mtx(3, 1) << "\t\t" << mtx(3, 2) << "\t\t" << mtx(3, 3) << std::endl;
-            //    std::cout << "---------------------------------------------------------" << std::endl;
-            //}
-            
             SetGltfTRS(gltfNode, mtx, true);
             gltfScene.nodes.push_back(gltfNode.id);
         }
         else // SceneNode = glTF::Node (non-root)
         {
             const auto& mtx = sceneNode->GetTransform();
-            //if (!MatrixDecompose(mtx, outScale, outRotation, outTranslation))
-            //{
-            //    std::cout << "--------------------------------------------------------" << parentNode->GetId() << std::endl;
-            //    std::cout << mtx(0, 0) << "\t\t" << mtx(0, 1) << "\t\t" << mtx(0, 2) << "\t\t" << mtx(0, 3) << std::endl;
-            //    std::cout << mtx(1, 0) << "\t\t" << mtx(1, 1) << "\t\t" << mtx(1, 2) << "\t\t" << mtx(1, 3) << std::endl;
-            //    std::cout << mtx(2, 0) << "\t\t" << mtx(2, 1) << "\t\t" << mtx(2, 2) << "\t\t" << mtx(2, 3) << std::endl;
-            //    std::cout << mtx(3, 0) << "\t\t" << mtx(3, 1) << "\t\t" << mtx(3, 2) << "\t\t" << mtx(3, 3) << std::endl;
-            //    std::cout << "---------------------------------------------------------" << std::endl;
-            //}
             SetGltfTRS(gltfNode, mtx);
             nodes[parentNode->GetIdString()].children.push_back(gltfNode.id);
         }
