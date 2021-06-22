@@ -318,41 +318,26 @@ namespace
         return false;
     }
 
-    void SetGltfTRS(glTF::Node& node, const Babylon::Utils::Math::Matrix& sourceMatrix, bool bRoot = false)
+    void SetGltfTRS(glTF::Node& node, const Babylon::Utils::Math::Matrix& sourceMatrix)
     {
-        //if (bRoot)
-        //{
-            Babylon::Utils::Math::Vector3 translation;
-            Babylon::Utils::Math::Quaternion rotation;
-            Babylon::Utils::Math::Vector3 scale;
+        Babylon::Utils::Math::Vector3 translation;
+        Babylon::Utils::Math::Quaternion rotation;
+        Babylon::Utils::Math::Vector3 scale;
 
-            MatrixDecompose(sourceMatrix, scale, rotation, translation);
+        MatrixDecompose(sourceMatrix, scale, rotation, translation);
 
-            node.translation.x = translation.x;
-            node.translation.y = translation.y;
-            node.translation.z = translation.z;
+        node.translation.x = translation.x;
+        node.translation.y = translation.y;
+        node.translation.z = translation.z;
 
-            node.rotation.x = rotation.x;
-            node.rotation.y = rotation.y;
-            node.rotation.z = rotation.z;
-            node.rotation.w = rotation.w;
+        node.rotation.x = rotation.x;
+        node.rotation.y = rotation.y;
+        node.rotation.z = rotation.z;
+        node.rotation.w = rotation.w;
 
-            node.scale.x = scale.x;
-            node.scale.y = scale.y;
-            node.scale.z = scale.z;
-            //node.scale.x = (scale.x == 0.0f ? scale.x : (1.0f / scale.x));
-            //node.scale.y = (scale.y == 0.0f ? scale.y : (1.0f / scale.y));
-            //node.scale.z = (scale.z == 0.0f ? scale.z : (1.0f / scale.z));
-        //}
-        //else
-        //{
-        //    node.matrix.values = {
-        //        sourceMatrix(0, 0), sourceMatrix(0, 1), sourceMatrix(0, 2), sourceMatrix(0, 3),
-        //        sourceMatrix(1, 0), sourceMatrix(1, 1), sourceMatrix(1, 2), sourceMatrix(1, 3),
-        //        sourceMatrix(2, 0), sourceMatrix(2, 1), sourceMatrix(2, 2), sourceMatrix(2, 3),
-        //        sourceMatrix(3, 0), sourceMatrix(3, 1), sourceMatrix(3, 2), sourceMatrix(3, 3)
-        //    };
-        //}
+        node.scale.x = scale.x;
+        node.scale.y = scale.y;
+        node.scale.z = scale.z;
     }
 
     std::string GetGenerator()
@@ -847,14 +832,12 @@ void Asset3DToGLTFConverter::PopulateDocument(IGLTFWriter& writer)
 
         if (parentNode == nullptr) // SceneNode = glTF::Node (root)
         {
-            auto mtx = m_asset3d.GetUnitScaledTransform(Asset3D::SYSTEMUNIT_METER);
-            SetGltfTRS(gltfNode, mtx, true);
+            SetGltfTRS(gltfNode, m_asset3d.GetUnitScaledTransform(Asset3D::SYSTEMUNIT_METER));
             gltfScene.nodes.push_back(gltfNode.id);
         }
         else // SceneNode = glTF::Node (non-root)
         {
-            const auto& mtx = sceneNode->GetTransform();
-            SetGltfTRS(gltfNode, mtx);
+            SetGltfTRS(gltfNode, sceneNode->GetTransform());
             nodes[parentNode->GetIdString()].children.push_back(gltfNode.id);
         }
 
