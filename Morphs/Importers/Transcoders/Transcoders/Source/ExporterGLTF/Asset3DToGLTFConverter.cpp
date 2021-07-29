@@ -345,7 +345,7 @@ namespace
         std::stringstream ss;
         // TODO: TEMP COMMENT
         //ss << glTF::MSFT_GLTF_EXPORTER_NAME << " "; // << Babylon_PACKAGE_VERSION;
-        ss << "self-defined converter"; // << Babylon_PACKAGE_VERSION;
+        ss << "babylon converter"; // << Babylon_PACKAGE_VERSION;
         return ss.str();
     }
 
